@@ -45,7 +45,7 @@ export const App: React.FC = () => {
   useEffect(() => {
     let es: EventSource | null = null
     try {
-      es = new EventSource('/api/v1/events/stream')
+      es = new EventSource(`${import.meta.env.VITE_API_URL || 'https://agentguard-931q.onrender.com'}/api/v1/events/stream`)
       es.onmessage = (e) => {
         if (e.data && !e.data.startsWith(':')) {
           refreshStatus()
