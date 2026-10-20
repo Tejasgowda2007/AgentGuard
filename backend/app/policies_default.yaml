@@ -1,0 +1,56 @@
+version: "1.0"
+metadata:
+  organization: "Northstar Systems"
+  environment: "DEMO/LOCAL"
+  description: "AgentGuard Default AI Runtime Governance Policies"
+
+policies:
+  - id: "rule-default-deny"
+    name: "Default Deny for Unknown Actions"
+    description: "Fail closed when an agent attempts an action outside its designated capability manifest."
+    rule_type: "DEFAULT_DENY"
+    action_pattern: "*"
+    condition_json: "{}"
+    decision: "BLOCK"
+    severity: "CRITICAL"
+    is_enabled: true
+
+  - id: "rule-deny-db-deletion"
+    name: "Hard Block Database Record Deletion"
+    description: "Strict deterministic block on direct database deletion operations by any agent."
+    rule_type: "HARD_DENY"
+    action_pattern: "delete_database_record"
+    condition_json: "{}"
+    decision: "BLOCK"
+    severity: "CRITICAL"
+    is_enabled: true
+
+  - id: "rule-refund-threshold"
+    name: "Human Review for Refunds Over $5,000"
+    description: "Requires dual-authorization / human reviewer sign-off for financial transactions exceeding $5,000."
+    rule_type: "THRESHOLD_REVIEW"
+    action_pattern: "issue_refund"
+    condition_json: '{"field": "amount", "operator": ">", "value": 5000}'
+    decision: "REVIEW"
+    severity: "MEDIUM"
+    is_enabled: true
+
+  - id: "rule-block-unapproved-egress"
+    name: "Block External Sensitive Egress"
+    description: "Prevents customer dataset transfers to unauthorized external destinations or webhooks."
+    rule_type: "HARD_DENY"
+    action_pattern: "transfer_customer_data"
+    condition_json: '{"field": "destination", "operator": "in", "value": ["unapproved", "webhook.site", "external"]}'
+    decision: "BLOCK"
+    severity: "HIGH"
+    is_enabled: true
+
+  - id: "rule-sliding-rate-limit"
+    name: "Per-Agent Rate Limiting"
+    description: "Enforces sliding-window rate limit to prevent agent runaway loops and API exhaustion."
+    rule_type: "RATE_LIMIT"
+    action_pattern: "*"
+    condition_json: '{"window_seconds": 60}'
+    decision: "BLOCK"
+    severity: "HIGH"
+    is_enabled: true
